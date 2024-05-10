@@ -11,6 +11,7 @@ public class AssuranceServiceApplication {
 
     public static void main(String[] args) {
         SpringApplication.run(AssuranceServiceApplication.class, args);
+        System.out.println("Hello Assurance Service");
     }
 
 }

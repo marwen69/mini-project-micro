@@ -7,11 +7,13 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="config-service" />
+        <module name="contract-service" />
+        <module name="gateway-service" />
         <module name="assurance-service" />
         <module name="contrat-service" />
-        <module name="discovery-service" />
-        <module name="gateway-service" />
         <module name="talentGateway" />
+        <module name="Miniproject" />
+        <module name="discovery-service" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
@@ -24,6 +26,7 @@
       <module name="assurance" options="-parameters" />
       <module name="assurance-service" options="-parameters" />
       <module name="config-service" options="-parameters" />
+      <module name="contract-service" options="-parameters" />
       <module name="contrat" options="-parameters" />
       <module name="contrat-service" options="-parameters" />
       <module name="discovery-service" options="-parameters" />

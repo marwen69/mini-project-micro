@@ -1,0 +1,91 @@
+version: '3.8'
+
+services:
+  discovery-service:
+    build: ./discovery-service
+    ports:
+      - "8761:8761"
+    networks:
+      - my-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8761/actuator/health" ]
+      interval: 20s
+      retries: 4
+
+
+  mysqldb2:
+    image: mysql:8.0.13
+    container_name: mysqldb2
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=assurance
+    networks:
+      - my-network
+    volumes:
+      - my-datavolume:/var/lib/mysql
+
+
+  config-service:
+    build: ./config-service
+    ports:
+      - "9999:9999"
+    networks:
+      - my-network
+    environment:
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:9999/actuator/health" ]
+      interval: 10s
+      retries: 4
+    depends_on:
+      discovery-service:
+        condition: service_healthy
+
+  gateway-service:
+    build: ./gateway-service
+    container_name:   gateway-service
+    ports:
+      - '8888:8888'
+    expose:
+      - '8888'
+    environment:
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:9999
+    networks:
+      - my-network
+    depends_on:
+      config-service:
+        condition: service_healthy
+
+  assurance-service:
+    build: ./assurance-service
+    ports:
+      - "8085:8085"
+    environment:
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:9999
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb2:3306/assurance?createDatabaseIfNotExist=true
+    networks:
+      - my-network
+
+  contrat-service:
+    build: ./contrat-service
+    ports:
+      - "8086:8086"
+    environment:
+      - DISCOVERY_SERVICE_URL=http://discovery-service:8761/eureka
+      - CONFIG_SERVICE_URL=http://config-service:9999
+      - SPRING_DATASOURCE_URL=jdbc:mysql://mysqldb2:3306/contrat1?createDatabaseIfNotExist=true
+    networks:
+      - my-network
+
+
+
+
+networks:
+  my-network:
+    driver: bridge
+volumes:
+  my-datavolume:
